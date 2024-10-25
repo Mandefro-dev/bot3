@@ -39,6 +39,11 @@ const init = () => {
   //writing query
   bot.on("callback_query", (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
+    console.log("Callback Query Chat ID:", chatId);
+    bot.sendMessage(chatId, "Processing your request...").catch((error) => {
+      console.error("Failed to send message:", error);
+      // Optionally notify admin or log it to a file for further review
+    });
     const action = callbackQuery.data;
     const userId = callbackQuery.from.id;
     const username =
