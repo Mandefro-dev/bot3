@@ -1,5 +1,9 @@
+const express = require("express");
 const commentService = require("../services/comments");
 require("dotenv").config();
+const TelegramBot = require("node-telegram-bot-api");
+
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
 const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
 
@@ -19,7 +23,7 @@ const createInlineKeyboard = () => {
     },
   };
 };
-module.exports = (bot) => {
+const init = () => {
   bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -108,4 +112,7 @@ module.exports = (bot) => {
     //   "Thanks for your comment! If you need help, feel free to ask."
     // );
   });
+};
+module.exports = {
+  init,
 };
