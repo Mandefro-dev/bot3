@@ -54,13 +54,13 @@ const init = () => {
       bot.once("message", (msg) => {
         commentService.addComment(userId, msg.text);
         bot.sendMessage(chatId, "Thanks for your comment!");
-        //notfiy to admin
-        // adminIds.forEach((adminid) => {
-        //   bot.sendMessage(
-        //     adminid.trim(),
-        //     `New comment @${username}:${msg.text}`
-        //   );
-        // });
+        // notfiy to admin
+        adminIds.forEach((adminid) => {
+          bot.sendMessage(
+            adminid.trim(),
+            `New comment from someone:${msg.text}`
+          );
+        });
       });
       // bot.sendMessage(
       //   process.env.ADMIN_IDS,
@@ -72,9 +72,9 @@ const init = () => {
         commentService.addIdea(userId, msg.text);
         bot.sendMessage(chatId, "Thanks for your suggestion!");
         //notfiy to admin
-        // adminIds.array.forEach((adminid) => {
-        //   bot.sendMessage(adminid.trim(), `New Idea @${username}:${msg.text}`);
-        // });
+        adminIds.forEach((adminid) => {
+          bot.sendMessage(adminid.trim(), `New Idea from someone:${msg.text}`);
+        });
       });
     } else if (action === "ask_help") {
       bot.sendMessage(chatId, "please describe the help you need! ");
@@ -85,12 +85,12 @@ const init = () => {
           "Thanks for reaching out! The admin will review your request."
         );
         //notfiy to admin
-        // adminIds.array.forEach((adminid) => {
-        //   bot.sendMessage(
-        //     adminid.trim(),
-        //     `New help request @${username}:${msg.text}`
-        //   );
-        // });
+        adminIds.forEach((adminid) => {
+          bot.sendMessage(
+            adminid.trim(),
+            `New help request from someone:${msg.text}`
+          );
+        });
       });
     } else if (action === "View_all_comments") {
       if (adminIds.includes(callbackQuery.from.id.toString())) {
