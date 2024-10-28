@@ -40,7 +40,7 @@ const init = () => {
   bot.on("callback_query", (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
     console.log("Callback Query Chat ID:", chatId);
-    bot.sendMessage(chatId, "Processing your request...").catch((error) => {
+    bot.sendMessage().catch((error) => {
       console.error("Failed to send message:", error);
       // Optionally notify admin or log it to a file for further review
     });
@@ -55,12 +55,12 @@ const init = () => {
         commentService.addComment(userId, msg.text);
         bot.sendMessage(chatId, "Thanks for your comment!");
         //notfiy to admin
-        adminIds.forEach((adminid) => {
-          bot.sendMessage(
-            adminid.trim(),
-            `New comment @${username}:${msg.text}`
-          );
-        });
+        // adminIds.forEach((adminid) => {
+        //   bot.sendMessage(
+        //     adminid.trim(),
+        //     `New comment @${username}:${msg.text}`
+        //   );
+        // });
       });
       // bot.sendMessage(
       //   process.env.ADMIN_IDS,
@@ -72,12 +72,12 @@ const init = () => {
         commentService.addIdea(userId, msg.text);
         bot.sendMessage(chatId, "Thanks for your suggestion!");
         //notfiy to admin
-        adminIds.array.forEach((adminid) => {
-          bot.sendMessage(adminid.trim(), `New Idea @${username}:${msg.text}`);
-        });
+        // adminIds.array.forEach((adminid) => {
+        //   bot.sendMessage(adminid.trim(), `New Idea @${username}:${msg.text}`);
+        // });
       });
     } else if (action === "ask_help") {
-      bot.sendMessage(chatId, "please describe the help you need ");
+      bot.sendMessage(chatId, "please describe the help you need! ");
       bot.once("message", (msg) => {
         commentService.addHelpRequest(userId, msg.text);
         bot.sendMessage(
@@ -85,12 +85,12 @@ const init = () => {
           "Thanks for reaching out! The admin will review your request."
         );
         //notfiy to admin
-        adminIds.array.forEach((adminid) => {
-          bot.sendMessage(
-            adminid.trim(),
-            `New help request @${username}:${msg.text}`
-          );
-        });
+        // adminIds.array.forEach((adminid) => {
+        //   bot.sendMessage(
+        //     adminid.trim(),
+        //     `New help request @${username}:${msg.text}`
+        //   );
+        // });
       });
     } else if (action === "View_all_comments") {
       if (adminIds.includes(callbackQuery.from.id.toString())) {
