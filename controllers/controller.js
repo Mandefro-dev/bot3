@@ -6,6 +6,28 @@ const TelegramBot = require("node-telegram-bot-api");
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
 const adminIds = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(",") : [];
+bot.setMyCommands([
+  {
+    command: "/start",
+    description: "Start the bot",
+  },
+  {
+    command: "/give_comment",
+    description: "Submit a comment",
+  },
+  {
+    command: "/suggest_idea",
+    description: "Suggest new idea",
+  },
+  {
+    command: "/ask_help",
+    description: "Request help",
+  },
+  {
+    command: "/view_all_comments",
+    description: "See comments for admins",
+  },
+]);
 
 const createInlineKeyboard = () => {
   return {
@@ -36,6 +58,73 @@ const init = () => {
       keyboard
     );
   });
+  bot.onText(/\/help/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(
+      chatId,
+      `Use the commands or menu options to: \n1. Submit Comments\n2. Suggest New Ideas\n3. Request help`
+    );
+  });
+  bot.onText(/\/give_comment/, (msg) => {
+    const userId = msg.from.id;
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, "Please Type your comment here");
+    bot.once("message", (msg) => {
+      commentService.addComment(userId, msg.text);
+      bot.sendMessage(chatId, "Thanks for your comment!");
+      // notfiy to admin
+      adminIds.forEach((adminid) => {
+        bot.sendMessage(adminid.trim(), `New comment from someone:${msg.text}`);
+      });
+    });
+  });
+  bot.onText(/\/suggest_idea/, (msg) => {
+    const userId = msg.from.id;
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, "Please Type your idea here");
+    bot.once("message", (msg) => {
+      commentService.addIdea(userId, msg.text);
+      bot.sendMessage(chatId, "Thanks for your suggestion!");
+      //notfiy to admin
+      adminIds.forEach((adminid) => {
+        bot.sendMessage(adminid.trim(), `New Idea from someone:${msg.text}`);
+      });
+    });
+  });
+  bot.onText(/\/ask_help/, (msg) => {
+    const userId = msg.from.id;
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, "please describe the help you need! ");
+    bot.once("message", (msg) => {
+      commentService.addHelpRequest(userId, msg.text);
+      bot.sendMessage(
+        chatId,
+        "Thanks for reaching out! The admin will review your request."
+      );
+      //notfiy to admin
+      adminIds.forEach((adminid) => {
+        bot.sendMessage(
+          adminid.trim(),
+          `New help request from someone:${msg.text}`
+        );
+      });
+    });
+  });
+
+  bot.onText(/\/view_all_comments/, (msg) => {
+    const userId = msg.from.id;
+    const chatId = msg.chat.id;
+    if (adminIds.includes(userId.toString())) {
+      const allComments = commentService.getAllComments();
+      bot.sendMessage(
+        chatId,
+        allComments.length > 0 ? allComments.join("\n\n") : "no comments yet"
+      );
+    } else {
+      bot.sendMessage(chatId, "You are not allowed to see all comments!");
+    }
+  });
+
   //writing query
   bot.on("callback_query", (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
